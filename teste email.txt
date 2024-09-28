@@ -1,0 +1,59 @@
+/*class EmailReport {
+  constructor(sheet, email) {
+    this.spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    this.sheet = this.spreadsheet.getSheetByName("TEMPORÁRIO");
+    this.email = "email@gmail.com";
+    this.htmlTable = "";
+  }
+
+  generateHtmlTable() {
+    const lastRow = this.sheet.getLastRow();
+    
+    this.htmlTable = `
+      <table border="1" style="border-collapse: collapse; width: 100%;">
+        <tr>
+          <th>Código</th>
+          <th>Nome</th>
+          <th>Termino</th>
+          <th>Dias Vencidos</th>
+        </tr>`;
+
+    for (let i = 1; i <= lastRow; i++) {
+      const diasVencidos = this.sheet.getRange(i, 4).getValue();
+      if (diasVencidos <= 2 ) {
+        const codigo = this.sheet.getRange(i, 1).getValue();
+        const nome = this.sheet.getRange(i, 2).getValue();
+        const termino = Utilities.formatDate(this.sheet.getRange(i, 3).getValue(), "GMT-03:00", "dd/MM/yyyy");
+
+        this.htmlTable += `
+          <tr>
+            <td>${codigo}</td>
+            <td>${nome}</td>
+            <td>${termino}</td>
+            <td>${diasVencidos}</td>
+          </tr>`;
+      }
+    }
+
+    this.htmlTable += `</table>`;
+  }
+
+  sendEmail() {
+    const corpoEmail = `<p>Segue abaixo a tabela com os documentos vencidos:</p>${this.htmlTable}`;
+    
+    MailApp.sendEmail({
+      to: this.email,
+      subject: "Relatório de Documentos Vencidos",
+      htmlBody: corpoEmail
+    });
+    
+    //Logger.log(`Restam: ${MailApp.getRemainingDailyQuota()} emails na quota diária.`);
+    ///console.log(corpoEmail);
+  }
+}
+
+function enviarEmailComTabela() {
+ const emailReport = new EmailReport("TEMPORÁRIO", "email@gmail.com");
+  emailReport.generateHtmlTable();
+  emailReport.sendEmail();
+}
